@@ -1,9 +1,9 @@
 {
-  "id": "gpt5-pdf-flashcards",
-  "name": "PDF Flashcards",
+  "id": "obsidian-study-assist",
+  "name": "Obsidian Study Assist",
   "version": "0.1.0",
   "minAppVersion": "1.5.0",
-  "description": "Highlight PDFs (incl. flashcard pen) and generate flashcards.",
+  "description": "Highlight PDFs and generate AI flashcards inside Obsidian.",
   "author": "Fabian Rohlik",
   "authorUrl": "",
   "isDesktopOnly": false

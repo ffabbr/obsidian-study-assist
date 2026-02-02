@@ -1,4 +1,4 @@
-# PDF Flashcards
+# Obsidian Study Assist
 
 Create AI flashcards from PDF highlights inside Obsidian.
 
@@ -7,6 +7,10 @@ Create AI flashcards from PDF highlights inside Obsidian.
 - Generate flashcards from flashcard highlights using OpenAI.
 - Study flashcards in a built-in review view with spaced repetition.
 - Export all PDF annotations to a markdown file grouped by color.
+
+## Screenshots
+![PDF Annotations](media/PDF%20Annotation.png)
+![Flashcards](media/Flashcards.png)
 
 ## How To Use
 1. Open a PDF in Obsidian.

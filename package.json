@@ -1,7 +1,7 @@
 {
-  "name": "gpt5-pdf-flashcards",
+  "name": "obsidian-study-assist",
   "version": "0.1.0",
-  "description": "Obsidian plugin for PDF highlights and flashcards",
+  "description": "Obsidian plugin for PDF highlights and AI flashcards",
   "main": "main.js",
   "scripts": {
     "build": "node esbuild.config.mjs production",

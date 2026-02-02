@@ -1,4 +1,4 @@
-.gpt5-pdf-toolbar {
+.study-assist-pdf-toolbar {
   position: sticky;
   top: 0;
   z-index: 10;
@@ -9,7 +9,7 @@
   border-bottom: 1px solid var(--background-modifier-border);
 }
 
-.gpt5-pdf-toolbar button {
+.study-assist-pdf-toolbar button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -21,14 +21,14 @@
   font-size: 12px;
 }
 
-.gpt5-pdf-toolbar .gpt5-color-swatch {
+.study-assist-pdf-toolbar .study-assist-color-swatch {
   width: 14px;
   height: 14px;
   border-radius: 3px;
   border: 1px solid rgba(0,0,0,0.15);
 }
 
-.gpt5-highlight-layer {
+.study-assist-highlight-layer {
   position: absolute;
   top: 0;
   left: 0;
@@ -37,18 +37,18 @@
   pointer-events: none;
 }
 
-.gpt5-highlight {
+.study-assist-highlight {
   position: absolute;
   border-radius: 2px;
   opacity: 0.35;
   mix-blend-mode: multiply;
 }
 
-.gpt5-highlight.flashcard {
+.study-assist-highlight.flashcard {
   opacity: 0.5;
 }
 
-.gpt5-flashcard-view {
+.study-assist-flashcard-view {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -56,7 +56,7 @@
   gap: 12px;
 }
 
-.gpt5-flashcard-card {
+.study-assist-flashcard-card {
   flex: 1;
   border: 1px solid var(--background-modifier-border);
   border-radius: 12px;
@@ -70,13 +70,13 @@
   cursor: pointer;
 }
 
-.gpt5-flashcard-controls {
+.study-assist-flashcard-controls {
   display: flex;
   gap: 8px;
   justify-content: center;
 }
 
-.gpt5-flashcard-controls button {
+.study-assist-flashcard-controls button {
   padding: 8px 16px;
   border-radius: 8px;
   border: 1px solid var(--background-modifier-border);
@@ -84,13 +84,13 @@
   cursor: pointer;
 }
 
-.gpt5-flashcard-meta {
+.study-assist-flashcard-meta {
   font-size: 12px;
   color: var(--text-muted);
   text-align: center;
 }
 
-.gpt5-flashcard-manage {
+.study-assist-flashcard-manage {
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -99,20 +99,20 @@
   overflow: hidden;
 }
 
-.gpt5-manage-header h3 {
+.study-assist-manage-header h3 {
   margin: 0;
 }
 
-.gpt5-manage-add,
-.gpt5-manage-row {
+.study-assist-manage-add,
+.study-assist-manage-row {
   display: grid;
   grid-template-columns: 1fr 1fr auto;
   gap: 8px;
   align-items: start;
 }
 
-.gpt5-manage-add textarea,
-.gpt5-manage-row textarea {
+.study-assist-manage-add textarea,
+.study-assist-manage-row textarea {
   min-height: 64px;
   resize: vertical;
   padding: 8px;
@@ -122,8 +122,8 @@
   font-size: 13px;
 }
 
-.gpt5-manage-add button,
-.gpt5-manage-actions button {
+.study-assist-manage-add button,
+.study-assist-manage-actions button {
   padding: 8px 12px;
   border-radius: 8px;
   border: 1px solid var(--background-modifier-border);
@@ -133,13 +133,13 @@
   width: 80px;
 }
 
-.gpt5-manage-actions {
+.study-assist-manage-actions {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.gpt5-manage-list {
+.study-assist-manage-list {
   display: flex;
   flex-direction: column;
   gap: 10px;

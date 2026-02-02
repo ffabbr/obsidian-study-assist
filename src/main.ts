@@ -89,8 +89,8 @@ const COLOR_MAP: Record<HighlightColor, string> = {
   flashcard: "#ffb3c1",
 };
 
-const FLASHCARD_VIEW_TYPE = "gpt5-flashcards-view";
-const FLASHCARD_MANAGE_VIEW_TYPE = "gpt5-flashcards-manage";
+const FLASHCARD_VIEW_TYPE = "study-assist-flashcards-view";
+const FLASHCARD_MANAGE_VIEW_TYPE = "study-assist-flashcards-manage";
 
 class FlashcardView extends ItemView {
   private plugin: PdfFlashcardsPlugin;
@@ -114,7 +114,7 @@ class FlashcardView extends ItemView {
 
   async onOpen() {
     this.containerEl.empty();
-    this.containerEl.addClass("gpt5-flashcard-view");
+    this.containerEl.addClass("study-assist-flashcard-view");
     await this.reload();
     this.render();
   }
@@ -164,9 +164,9 @@ class FlashcardView extends ItemView {
     this.containerEl.empty();
 
     const card = this.currentCard();
-    const cardEl = this.containerEl.createDiv({ cls: "gpt5-flashcard-card" });
-    const controls = this.containerEl.createDiv({ cls: "gpt5-flashcard-controls" });
-    const meta = this.containerEl.createDiv({ cls: "gpt5-flashcard-meta" });
+    const cardEl = this.containerEl.createDiv({ cls: "study-assist-flashcard-card" });
+    const controls = this.containerEl.createDiv({ cls: "study-assist-flashcard-controls" });
+    const meta = this.containerEl.createDiv({ cls: "study-assist-flashcard-meta" });
 
     if (!card) {
       if (this.cards.length === 0) {
@@ -221,7 +221,7 @@ class FlashcardManageView extends ItemView {
 
   async onOpen() {
     this.containerEl.empty();
-    this.containerEl.addClass("gpt5-flashcard-manage");
+    this.containerEl.addClass("study-assist-flashcard-manage");
     await this.reload();
     this.render();
   }
@@ -242,10 +242,10 @@ class FlashcardManageView extends ItemView {
   private render() {
     this.containerEl.empty();
 
-    const header = this.containerEl.createDiv({ cls: "gpt5-manage-header" });
+    const header = this.containerEl.createDiv({ cls: "study-assist-manage-header" });
     header.createEl("h3", { text: "Flashcards" });
 
-    const addForm = this.containerEl.createDiv({ cls: "gpt5-manage-add" });
+    const addForm = this.containerEl.createDiv({ cls: "study-assist-manage-add" });
     const qInput = addForm.createEl("textarea");
     qInput.placeholder = "Question";
     const aInput = addForm.createEl("textarea");
@@ -274,7 +274,7 @@ class FlashcardManageView extends ItemView {
       this.render();
     });
 
-    const list = this.containerEl.createDiv({ cls: "gpt5-manage-list" });
+    const list = this.containerEl.createDiv({ cls: "study-assist-manage-list" });
 
     if (this.cards.length === 0) {
       list.setText("No flashcards yet.");
@@ -282,12 +282,12 @@ class FlashcardManageView extends ItemView {
     }
 
     this.cards.forEach((card, index) => {
-      const row = list.createDiv({ cls: "gpt5-manage-row" });
+      const row = list.createDiv({ cls: "study-assist-manage-row" });
       const q = row.createEl("textarea");
       q.value = card.question;
       const a = row.createEl("textarea");
       a.value = card.answer;
-      const actions = row.createDiv({ cls: "gpt5-manage-actions" });
+      const actions = row.createDiv({ cls: "study-assist-manage-actions" });
       const saveBtn = actions.createEl("button", { text: "Save" });
       const deleteBtn = actions.createEl("button", { text: "Delete" });
 
@@ -339,7 +339,7 @@ class PdfLeafController {
     if (!container) return;
 
     if (!this.toolbar || !container.contains(this.toolbar)) {
-      this.toolbar = container.createDiv({ cls: "gpt5-pdf-toolbar" });
+      this.toolbar = container.createDiv({ cls: "study-assist-pdf-toolbar" });
       this.buildToolbar(this.toolbar);
     }
 
@@ -391,7 +391,7 @@ class PdfLeafController {
 
     buttons.forEach(({ color, label }) => {
       const btn = toolbar.createEl("button");
-      const swatch = btn.createSpan({ cls: "gpt5-color-swatch" });
+      const swatch = btn.createSpan({ cls: "study-assist-color-swatch" });
       swatch.style.background = COLOR_MAP[color];
       btn.createSpan({ text: label });
 
@@ -524,10 +524,10 @@ class PdfLeafController {
     const pageEls = Array.from(pdfViewer.querySelectorAll(".page")) as HTMLElement[];
     pageEls.forEach((pageEl) => {
       let layer = pageEl.querySelector(
-        ".gpt5-highlight-layer"
+        ".study-assist-highlight-layer"
       ) as HTMLDivElement | null;
       if (!layer) {
-        layer = pageEl.createDiv({ cls: "gpt5-highlight-layer" });
+        layer = pageEl.createDiv({ cls: "study-assist-highlight-layer" });
       }
       layer.empty();
 
@@ -537,7 +537,7 @@ class PdfLeafController {
         if (!page) return;
 
         page.rects.forEach((rect) => {
-          const hl = layer!.createDiv({ cls: "gpt5-highlight" });
+          const hl = layer!.createDiv({ cls: "study-assist-highlight" });
           hl.style.left = `${rect.x * 100}%`;
           hl.style.top = `${rect.y * 100}%`;
           hl.style.width = `${rect.w * 100}%`;
@@ -617,25 +617,25 @@ export default class PdfFlashcardsPlugin extends Plugin {
     this.registerView(FLASHCARD_MANAGE_VIEW_TYPE, (leaf) => new FlashcardManageView(leaf, this));
 
     this.addCommand({
-      id: "gpt5-generate-flashcards",
+      id: "study-assist-generate-flashcards",
       name: "Generate flashcards from PDF flashcard highlights",
       callback: () => void this.generateFlashcardsFromActivePdf(),
     });
 
     this.addCommand({
-      id: "gpt5-open-flashcards",
+      id: "study-assist-open-flashcards",
       name: "Open flashcard study view",
       callback: () => void this.openFlashcardView(),
     });
 
     this.addCommand({
-      id: "gpt5-manage-flashcards",
+      id: "study-assist-manage-flashcards",
       name: "Open flashcard manager",
       callback: () => void this.openFlashcardManageView(),
     });
 
     this.addCommand({
-      id: "gpt5-export-pdf-annotations",
+      id: "study-assist-export-pdf-annotations",
       name: "Export current PDF annotations to markdown",
       callback: () => void this.exportAnnotationsFromActivePdf(),
     });
