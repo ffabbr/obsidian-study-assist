@@ -25,12 +25,5 @@ Create AI flashcards from PDF highlights inside Obsidian.
 - **Model**: defaults to `gpt-5.1`.
 - **Storage folder**: where highlights, flashcards, and progress are stored (default: `.flashcards`).
 
-## Installation
-Install from the Obsidian Community Plugins browser once the plugin is published.
-
-## Development
-- `npm install`
-- `npm run dev`
-
 ## License
 MIT
