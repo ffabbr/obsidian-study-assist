@@ -1,0 +1,148 @@
+.gpt5-pdf-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+  padding: 6px 8px;
+  background: var(--background-secondary);
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.gpt5-pdf-toolbar button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--background-primary);
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.gpt5-pdf-toolbar .gpt5-color-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid rgba(0,0,0,0.15);
+}
+
+.gpt5-highlight-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.gpt5-highlight {
+  position: absolute;
+  border-radius: 2px;
+  opacity: 0.35;
+  mix-blend-mode: multiply;
+}
+
+.gpt5-highlight.flashcard {
+  opacity: 0.5;
+}
+
+.gpt5-flashcard-view {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px;
+  gap: 12px;
+}
+
+.gpt5-flashcard-card {
+  flex: 1;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 12px;
+  background: var(--background-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  font-size: 20px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.gpt5-flashcard-controls {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+.gpt5-flashcard-controls button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  cursor: pointer;
+}
+
+.gpt5-flashcard-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.gpt5-flashcard-manage {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  height: 100%;
+  overflow: hidden;
+}
+
+.gpt5-manage-header h3 {
+  margin: 0;
+}
+
+.gpt5-manage-add,
+.gpt5-manage-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 8px;
+  align-items: start;
+}
+
+.gpt5-manage-add textarea,
+.gpt5-manage-row textarea {
+  min-height: 64px;
+  resize: vertical;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  font-size: 13px;
+}
+
+.gpt5-manage-add button,
+.gpt5-manage-actions button {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+  cursor: pointer;
+  height: fit-content;
+  width: 80px;
+}
+
+.gpt5-manage-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gpt5-manage-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: auto;
+  padding-right: 4px;
+}

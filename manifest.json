@@ -1,0 +1,10 @@
+{
+  "id": "gpt5-pdf-flashcards",
+  "name": "PDF Flashcards",
+  "version": "0.1.0",
+  "minAppVersion": "1.5.0",
+  "description": "Highlight PDFs (incl. flashcard pen) and generate flashcards.",
+  "author": "Fabian Rohlik",
+  "authorUrl": "",
+  "isDesktopOnly": false
+}

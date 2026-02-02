@@ -1,0 +1,16 @@
+{
+  "name": "gpt5-pdf-flashcards",
+  "version": "0.1.0",
+  "description": "Obsidian plugin for PDF highlights and flashcards",
+  "main": "main.js",
+  "scripts": {
+    "build": "node esbuild.config.mjs production",
+    "dev": "node esbuild.config.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "esbuild": "^0.20.2",
+    "obsidian": "^1.5.8",
+    "typescript": "^5.4.5"
+  }
+}
