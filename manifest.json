@@ -3,7 +3,7 @@
   "name": "Study Assist",
   "version": "0.1.0",
   "minAppVersion": "1.5.0",
-  "description": "Highlight PDFs and generate AI flashcards inside Obsidian.",
+  "description": "Highlight PDFs and generate AI flashcards from the annotations.",
   "author": "Fabian Rohlik",
   "authorUrl": "",
   "isDesktopOnly": false
