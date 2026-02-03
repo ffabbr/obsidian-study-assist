@@ -670,6 +670,7 @@ export default class PdfFlashcardsPlugin extends Plugin {
   }
 
   private maybeAttachToPdfLeaf(leaf: WorkspaceLeaf) {
+    if ((this.app as any).isMobile) return;
     const viewType = (leaf.view as any).getViewType?.() ?? (leaf.view as any).viewType;
     if (viewType !== "pdf") return;
     const existing = this.pdfControllers.get(leaf);
