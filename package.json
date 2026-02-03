@@ -1,7 +1,7 @@
 {
   "name": "obsidian-study-assist",
   "version": "0.1.0",
-  "description": "Obsidian plugin for PDF highlights and AI flashcards",
+  "description": "Highlight PDFs and generate AI flashcards from the annotations.",
   "main": "main.js",
   "scripts": {
     "build": "node esbuild.config.mjs production",
