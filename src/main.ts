@@ -1,5 +1,6 @@
 import {
   App,
+  FileView,
   ItemView,
   Notice,
   Plugin,
@@ -7,6 +8,7 @@ import {
   Setting,
   TFile,
   WorkspaceLeaf,
+  requestUrl,
 } from "obsidian";
 
 type HighlightColor = "yellow" | "green" | "blue" | "flashcard";
@@ -51,6 +53,22 @@ interface Flashcard {
 interface FlashcardFile {
   version: number;
   cards: Flashcard[];
+}
+
+interface OpenAIOutputContent {
+  type?: string;
+  text?: string;
+}
+
+interface OpenAIOutputItem {
+  type?: string;
+  content?: OpenAIOutputContent[];
+}
+
+interface OpenAIResponseData {
+  output_text?: string;
+  output?: OpenAIOutputItem[];
+  content?: string;
 }
 
 interface CardProgress {
@@ -131,7 +149,7 @@ class FlashcardView extends ItemView {
     this.render();
   }
 
-  async onClose() {
+  onClose() {
     this.containerEl.empty();
   }
 
@@ -177,10 +195,12 @@ class FlashcardView extends ItemView {
       cardEl.setText("Congrats! You finished all flashcards.");
       controls.empty();
       const restartBtn = controls.createEl("button", { text: "Restart" });
-      restartBtn.addEventListener("click", async () => {
-        await this.plugin.resetProgress();
-        await this.reload();
-        this.render();
+      restartBtn.addEventListener("click", () => {
+        void (async () => {
+          await this.plugin.resetProgress();
+          await this.reload();
+          this.render();
+        })();
       });
       return;
     }
@@ -216,7 +236,7 @@ class FlashcardManageView extends ItemView {
   }
 
   getDisplayText() {
-    return "Flashcards Manager";
+    return "Flashcards manager";
   }
 
   async onOpen() {
@@ -226,7 +246,7 @@ class FlashcardManageView extends ItemView {
     this.render();
   }
 
-  async onClose() {
+  onClose() {
     this.containerEl.empty();
   }
 
@@ -252,26 +272,28 @@ class FlashcardManageView extends ItemView {
     aInput.placeholder = "Answer";
     const addBtn = addForm.createEl("button", { text: "Add" });
 
-    addBtn.addEventListener("click", async () => {
-      const question = qInput.value.trim();
-      const answer = aInput.value.trim();
-      if (!question || !answer) return;
+    addBtn.addEventListener("click", () => {
+      void (async () => {
+        const question = qInput.value.trim();
+        const answer = aInput.value.trim();
+        if (!question || !answer) return;
 
-      const now = new Date().toISOString();
-      const newCard: Flashcard = {
-        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-        sourcePath: "manual",
-        highlightIds: [],
-        question,
-        answer,
-        createdAt: now,
-      };
+        const now = new Date().toISOString();
+        const newCard: Flashcard = {
+          id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          sourcePath: "manual",
+          highlightIds: [],
+          question,
+          answer,
+          createdAt: now,
+        };
 
-      this.cards.unshift(newCard);
-      await this.plugin.replaceAllCards(this.cards);
-      qInput.value = "";
-      aInput.value = "";
-      this.render();
+        this.cards.unshift(newCard);
+        await this.plugin.replaceAllCards(this.cards);
+        qInput.value = "";
+        aInput.value = "";
+        this.render();
+      })();
     });
 
     const list = this.containerEl.createDiv({ cls: "study-assist-manage-list" });
@@ -291,19 +313,23 @@ class FlashcardManageView extends ItemView {
       const saveBtn = actions.createEl("button", { text: "Save" });
       const deleteBtn = actions.createEl("button", { text: "Delete" });
 
-      saveBtn.addEventListener("click", async () => {
-        const question = q.value.trim();
-        const answer = a.value.trim();
-        if (!question || !answer) return;
-        this.cards[index] = { ...card, question, answer };
-        await this.plugin.replaceAllCards(this.cards);
+      saveBtn.addEventListener("click", () => {
+        void (async () => {
+          const question = q.value.trim();
+          const answer = a.value.trim();
+          if (!question || !answer) return;
+          this.cards[index] = { ...card, question, answer };
+          await this.plugin.replaceAllCards(this.cards);
+        })();
       });
 
-      deleteBtn.addEventListener("click", async () => {
-        this.cards.splice(index, 1);
-        await this.plugin.replaceAllCards(this.cards);
-        await this.plugin.removeProgress(card.id);
-        this.render();
+      deleteBtn.addEventListener("click", () => {
+        void (async () => {
+          this.cards.splice(index, 1);
+          await this.plugin.replaceAllCards(this.cards);
+          await this.plugin.removeProgress(card.id);
+          this.render();
+        })();
       });
     });
   }
@@ -324,8 +350,8 @@ class PdfLeafController {
     this.leaf = leaf;
   }
 
-  async init() {
-    await this.ensureAttached();
+  init() {
+    this.ensureAttached();
   }
 
   destroy() {
@@ -334,7 +360,7 @@ class PdfLeafController {
     if (this.retryTimer) window.clearTimeout(this.retryTimer);
   }
 
-  async ensureAttached(retries = 5) {
+  ensureAttached(retries = 5) {
     const container = this.leaf.view.containerEl;
     if (!container) return;
 
@@ -395,34 +421,36 @@ class PdfLeafController {
       swatch.style.background = COLOR_MAP[color];
       btn.createSpan({ text: label });
 
-      btn.addEventListener("click", async () => {
-        const selection = window.getSelection();
-        if (!selection || selection.isCollapsed) {
-          new Notice("Select text in the PDF first.");
-          return;
-        }
+      btn.addEventListener("click", () => {
+        void (async () => {
+          const selection = window.getSelection();
+          if (!selection || selection.isCollapsed) {
+            new Notice("Select text in the PDF first.");
+            return;
+          }
 
-        const pdfViewer = this.findPdfViewer();
-        if (!pdfViewer) {
-          new Notice("PDF viewer not found.");
-          return;
-        }
+          const pdfViewer = this.findPdfViewer();
+          if (!pdfViewer) {
+            new Notice("PDF viewer not found.");
+            return;
+          }
 
-        const highlight = this.buildHighlightFromSelection(selection, pdfViewer, color);
-        if (!highlight) {
-          new Notice("Could not capture selection.");
-          return;
-        }
+          const highlight = this.buildHighlightFromSelection(selection, pdfViewer, color);
+          if (!highlight) {
+            new Notice("Could not capture selection.");
+            return;
+          }
 
-        const file = this.getPdfFile();
-        if (!file) {
-          new Notice("No PDF file associated with this view.");
-          return;
-        }
+          const file = this.getPdfFile();
+          if (!file) {
+            new Notice("No PDF file associated with this view.");
+            return;
+          }
 
-        await this.plugin.saveHighlight(file.path, highlight);
-        selection.removeAllRanges();
-        await this.renderHighlights();
+          await this.plugin.saveHighlight(file.path, highlight);
+          selection.removeAllRanges();
+          await this.renderHighlights();
+        })();
       });
     });
   }
@@ -431,16 +459,16 @@ class PdfLeafController {
     const container = this.leaf.view.containerEl;
     if (!container) return null;
     return (
-      container.querySelector(".pdf-viewer") ||
-      container.querySelector(".pdfViewer") ||
-      container.querySelector(".pdf-viewer-container")
-    ) as HTMLElement | null;
+      container.querySelector<HTMLElement>(".pdf-viewer") ??
+      container.querySelector<HTMLElement>(".pdfViewer") ??
+      container.querySelector<HTMLElement>(".pdf-viewer-container")
+    );
   }
 
   private getPdfFile(): TFile | null {
-    const view: any = this.leaf.view as any;
-    if (view?.file instanceof TFile) return view.file as TFile;
-    return this.leaf?.view?.file ?? null;
+    const view = this.leaf.view;
+    if (view instanceof FileView && view.file instanceof TFile) return view.file;
+    return null;
   }
 
   private buildHighlightFromSelection(
@@ -455,7 +483,7 @@ class PdfLeafController {
     );
     if (rects.length === 0) return null;
 
-    const pages = Array.from(pdfViewer.querySelectorAll(".page")) as HTMLElement[];
+    const pages = Array.from(pdfViewer.querySelectorAll<HTMLElement>(".page"));
     if (pages.length === 0) return null;
 
     const pageMap = new Map<number, HighlightRect[]>();
@@ -521,11 +549,9 @@ class PdfLeafController {
     const highlights = await this.plugin.loadHighlights(file.path);
     if (highlights.length === 0) return;
 
-    const pageEls = Array.from(pdfViewer.querySelectorAll(".page")) as HTMLElement[];
+    const pageEls = Array.from(pdfViewer.querySelectorAll<HTMLElement>(".page"));
     pageEls.forEach((pageEl) => {
-      let layer = pageEl.querySelector(
-        ".study-assist-highlight-layer"
-      ) as HTMLDivElement | null;
+      let layer = pageEl.querySelector<HTMLDivElement>(".study-assist-highlight-layer");
       if (!layer) {
         layer = pageEl.createDiv({ cls: "study-assist-highlight-layer" });
       }
@@ -537,7 +563,7 @@ class PdfLeafController {
         if (!page) return;
 
         page.rects.forEach((rect) => {
-          const hl = layer!.createDiv({ cls: "study-assist-highlight" });
+          const hl = layer.createDiv({ cls: "study-assist-highlight" });
           hl.style.left = `${rect.x * 100}%`;
           hl.style.top = `${rect.y * 100}%`;
           hl.style.width = `${rect.w * 100}%`;
@@ -563,11 +589,11 @@ class PdfFlashcardsSettingTab extends PluginSettingTab {
     containerEl.empty();
 
     new Setting(containerEl)
-      .setName("OpenAI API key")
+      .setName("Your OpenAI API key")
       .setDesc("Stored locally in your Obsidian settings.")
       .addText((text) =>
         text
-          .setPlaceholder("sk-...")
+          .setPlaceholder("Example: sk-...")
           .setValue(this.plugin.settings.apiKey)
           .onChange(async (value) => {
             this.plugin.settings.apiKey = value.trim();
@@ -580,7 +606,7 @@ class PdfFlashcardsSettingTab extends PluginSettingTab {
       .setDesc("Default: gpt-5.1")
       .addText((text) =>
         text
-          .setPlaceholder("gpt-5.1")
+          .setPlaceholder("Example: gpt-5.1")
           .setValue(this.plugin.settings.model)
           .onChange(async (value) => {
             this.plugin.settings.model = value.trim() || "gpt-5.1";
@@ -617,30 +643,30 @@ export default class PdfFlashcardsPlugin extends Plugin {
     this.registerView(FLASHCARD_MANAGE_VIEW_TYPE, (leaf) => new FlashcardManageView(leaf, this));
 
     this.addCommand({
-      id: "study-assist-generate-flashcards",
+      id: "generate-flashcards",
       name: "Generate flashcards from PDF flashcard highlights",
       callback: () => void this.generateFlashcardsFromActivePdf(),
     });
 
     this.addCommand({
-      id: "study-assist-open-flashcards",
+      id: "open-flashcards",
       name: "Open flashcard study view",
       callback: () => void this.openFlashcardView(),
     });
 
     this.addCommand({
-      id: "study-assist-manage-flashcards",
+      id: "manage-flashcards",
       name: "Open flashcard manager",
       callback: () => void this.openFlashcardManageView(),
     });
 
     this.addCommand({
-      id: "study-assist-export-pdf-annotations",
-      name: "Export current PDF annotations to markdown",
+      id: "export-pdf-annotations",
+      name: "Export current PDF annotations to Markdown",
       callback: () => void this.exportAnnotationsFromActivePdf(),
     });
 
-    this.addRibbonIcon("sparkles", "Generate Flashcards", () =>
+    this.addRibbonIcon("sparkles", "Generate flashcards", () =>
       void this.generateFlashcardsFromActivePdf()
     );
     this.addRibbonIcon("dice-4", "Flashcards", () => void this.openFlashcardView());
@@ -670,18 +696,18 @@ export default class PdfFlashcardsPlugin extends Plugin {
   }
 
   private maybeAttachToPdfLeaf(leaf: WorkspaceLeaf) {
-    if ((this.app as any).isMobile) return;
-    const viewType = (leaf.view as any).getViewType?.() ?? (leaf.view as any).viewType;
+    if (this.app.isMobile) return;
+    const viewType = leaf.view.getViewType();
     if (viewType !== "pdf") return;
     const existing = this.pdfControllers.get(leaf);
     if (existing) {
-      void existing.ensureAttached();
+      existing.ensureAttached();
       return;
     }
 
     const controller = new PdfLeafController(this, leaf);
     this.pdfControllers.set(leaf, controller);
-    void controller.init();
+    controller.init();
   }
 
   async loadSettings() {
@@ -904,11 +930,11 @@ export default class PdfFlashcardsPlugin extends Plugin {
   private getActivePdfFile(): TFile | null {
     const leaf = this.app.workspace.getMostRecentLeaf();
     if (!leaf) return null;
-    const viewType = (leaf.view as any).getViewType?.() ?? (leaf.view as any).viewType;
+    const viewType = leaf.view.getViewType();
     if (viewType !== "pdf") return null;
-    const view: any = leaf.view as any;
-    if (view?.file instanceof TFile) return view.file as TFile;
-    return leaf.view?.file ?? null;
+    const view = leaf.view;
+    if (view instanceof FileView && view.file instanceof TFile) return view.file;
+    return null;
   }
 
   private async generateFlashcardsFromActivePdf() {
@@ -919,7 +945,7 @@ export default class PdfFlashcardsPlugin extends Plugin {
     }
 
     if (!this.settings.apiKey) {
-      new Notice("Set your OpenAI API key in the plugin settings.");
+      new Notice("Set your OpenAI API key in the plugin settings first.");
       return;
     }
 
@@ -990,7 +1016,8 @@ export default class PdfFlashcardsPlugin extends Plugin {
   }
 
   private async callOpenAI(systemPrompt: string, userPrompt: string): Promise<string> {
-    const response = await fetch("https://api.openai.com/v1/responses", {
+    const response = await requestUrl({
+      url: "https://api.openai.com/v1/responses",
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -1004,27 +1031,27 @@ export default class PdfFlashcardsPlugin extends Plugin {
       }),
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
+    if (response.status < 200 || response.status >= 300) {
+      const errorText = response.text || JSON.stringify(response.json ?? "");
       throw new Error(`OpenAI API error: ${errorText}`);
     }
 
-    const data = await response.json();
+    const data = response.json as OpenAIResponseData;
     return this.extractOutputText(data);
   }
 
-  private extractOutputText(data: any): string {
+  private extractOutputText(data: OpenAIResponseData): string {
     if (data.output_text && typeof data.output_text === "string") {
       return data.output_text;
     }
 
     if (Array.isArray(data.output)) {
       for (const item of data.output) {
-        if (item?.type === "message" && Array.isArray(item?.content)) {
+        if (item?.type === "message" && Array.isArray(item.content)) {
           const textPart = item.content.find(
-            (content: any) => content.type === "output_text" || content.type === "text"
+            (content) => content.type === "output_text" || content.type === "text"
           );
-          if (textPart?.text) return textPart.text as string;
+          if (textPart?.text) return textPart.text;
         }
       }
     }
@@ -1057,7 +1084,7 @@ export default class PdfFlashcardsPlugin extends Plugin {
         active: true,
       });
     } else {
-      this.app.workspace.revealLeaf(leaf);
+      await this.app.workspace.revealLeaf(leaf);
     }
   }
 
@@ -1070,7 +1097,7 @@ export default class PdfFlashcardsPlugin extends Plugin {
         active: true,
       });
     } else {
-      this.app.workspace.revealLeaf(leaf);
+      await this.app.workspace.revealLeaf(leaf);
     }
   }
 
@@ -1078,9 +1105,9 @@ export default class PdfFlashcardsPlugin extends Plugin {
     const leaves = this.app.workspace.getLeavesOfType(FLASHCARD_VIEW_TYPE);
     if (leaves.length === 0) return;
     for (const leaf of leaves) {
-      const view = leaf.view as FlashcardView;
-      if ((view as any)?.refresh) {
-        await (view as any).refresh();
+      const view = leaf.view;
+      if (view instanceof FlashcardView) {
+        await view.refresh();
       }
     }
   }
@@ -1089,9 +1116,9 @@ export default class PdfFlashcardsPlugin extends Plugin {
     const leaves = this.app.workspace.getLeavesOfType(FLASHCARD_MANAGE_VIEW_TYPE);
     if (leaves.length === 0) return;
     for (const leaf of leaves) {
-      const view = leaf.view as FlashcardManageView;
-      if ((view as any)?.refresh) {
-        await (view as any).refresh();
+      const view = leaf.view;
+      if (view instanceof FlashcardManageView) {
+        await view.refresh();
       }
     }
   }
